@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.projectsforge.xwiki</groupId>
+	<artifactId>commentnotification</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>XWiki Comment notification</name>
+	<packaging>jar</packaging>
+
+	<organization>
+		<name>Projectsforge.org</name>
+		<url>https://gitlab.projectsforge.org</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>sebtic@projectsforge.org</id>
+			<name>Sébastien Aupetit</name>
+			<email>sebtic@projectsforge.org</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://gitlab.projectsforge.org/XWiki/commentnotification</url>
+		<connection>scm:git:https://gitlab.projectsforge.org/XWiki/commentnotification.git</connection>
+		<developerConnection>scm:git:ssh://git@gitlab.projectsforge.org:2222/XWiki/commentnotification.git</developerConnection>
+	</scm>
+	<ciManagement>
+		<system>gitlab-ci</system>
+		<url>https://gitlab.projectsforge.org/XWiki/commentnotification</url>
+	</ciManagement>
+	<issueManagement>
+		<system>gitlab</system>
+		<url>https://gitlab.projectsforge.org/XWiki/commentnotification/issues</url>
+	</issueManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<commons.version>8.1</commons.version>
+		<rendering.version>8.1</rendering.version>
+		<platform.version>8.1</platform.version>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnError>false</failOnError>
+					<quiet>true</quiet>
+					<source>${java.sources}</source>
+					<maxmemory>512m</maxmemory>
+					<docfilessubdirs>true</docfilessubdirs>
+					<detectLinks>false</detectLinks>
+					<detectJavaApiLink>true</detectJavaApiLink>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<debug>true</debug>
+					<failOnOver>false</failOnOver>
+					<optimize>true</optimize>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<verbose>false</verbose>
+				</configuration>
+			</plugin>
+
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.10.3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.10</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.19.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.2</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.xwiki.commons</groupId>
+			<artifactId>xwiki-commons-component-api</artifactId>
+			<version>${commons.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xwiki.commons</groupId>
+			<artifactId>xwiki-commons-script</artifactId>
+			<version>${commons.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${platform.version}</version>
+      <scope>provided</scope>
+    </dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>xwiki-snapshots</id>
+			<name>XWiki Nexus Snapshot Repository Proxy</name>
+			<url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>xwiki-releases</id>
+			<name>XWiki Nexus Releases Repository Proxy</name>
+			<url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>projectsforge-private-releases</id>
+			<url>https://nexus.projectsforge.org/repository/projectsforge-public-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>projectsforge-private-snapshots</id>
+			<url>https://nexus.projectsforge.org/repository/projectsforge-public-snapshots//</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>
