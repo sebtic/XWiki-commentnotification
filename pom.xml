@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.projectsforge.xwiki</groupId>
 	<artifactId>commentnotification</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>XWiki Comment notification</name>
 	<packaging>jar</packaging>
 
