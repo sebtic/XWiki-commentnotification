@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
@@ -63,8 +64,8 @@ public class CommentNotificationEventListener implements EventListener {
   private MailSender mailSender;
 
   @Inject
-  @Named("database")
-  private MailListener databaseMailListener;
+  @Named("memory")
+  private Provider<MailListener> databaseMailListenerProvider;
 
   @Override
   public List<Event> getEvents() {
@@ -141,7 +142,7 @@ public class CommentNotificationEventListener implements EventListener {
       message.setContent(multipart);
 
       // Step 4 : Send the mail asynchronously with a Database Mail Listener
-      mailSender.sendAsynchronously(Arrays.asList(message), session, databaseMailListener);
+      mailSender.sendAsynchronously(Arrays.asList(message), session, databaseMailListenerProvider.get());
       logger.debug("Message sent");
     } catch (Exception e) {
       this.logger.error("Failure in comment listener", e);
