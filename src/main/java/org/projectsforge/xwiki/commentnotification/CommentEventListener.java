@@ -70,9 +70,13 @@ public class CommentEventListener implements EventListener {
     XWikiDocument document = (XWikiDocument) source;
     XWikiContext context = (XWikiContext) data;
 
+    logger.debug("CommentEventListener::onEvent");
+
     try {
       String lastAuthorEmail = context.getWiki().getDocument(document.getAuthorReference(), context)
           .getXObject(USER_CLASS_REFERENCE).getStringValue("email");
+
+      logger.debug("lastAuthorEmail is {}", lastAuthorEmail);
 
       // there is no destination email => stop here
       if (StringUtils.isBlank(lastAuthorEmail)) {
@@ -80,6 +84,7 @@ public class CommentEventListener implements EventListener {
       }
 
       BaseObject commentObject = document.getXObject(COMMENT_CLASS_REFERENCE);
+      logger.debug("commentObj {}", commentObject);
 
       // there is no comment !!!
       if (commentObject == null) {
@@ -111,6 +116,7 @@ public class CommentEventListener implements EventListener {
 
       // Step 4 : Send the mail asynchronously with a Database Mail Listener
       mailSender.sendAsynchronously(Arrays.asList(message), session, databaseMailListener);
+      logger.debug("Message sent");
     } catch (Exception e) {
       this.logger.error("Failure in comment listener", e);
     }
