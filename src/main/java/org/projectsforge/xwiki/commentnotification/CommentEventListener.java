@@ -28,8 +28,8 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.CommentAddedEvent;
-import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component
@@ -57,7 +57,7 @@ public class CommentEventListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event> asList(new CommentAddedEvent(), new CommentUpdatedEvent());
+    return Arrays.<Event> asList(new XObjectAddedEvent(), new XObjectUpdatedEvent());
   }
 
   @Override
@@ -73,6 +73,13 @@ public class CommentEventListener implements EventListener {
     logger.debug("CommentEventListener::onEvent");
 
     try {
+      BaseObject commentObject = document.getXObject(COMMENT_CLASS_REFERENCE);
+
+      // there is no comment !!!
+      if (commentObject == null) {
+        return;
+      }
+
       String lastAuthorEmail = context.getWiki().getDocument(document.getAuthorReference(), context)
           .getXObject(USER_CLASS_REFERENCE).getStringValue("email");
 
@@ -80,14 +87,6 @@ public class CommentEventListener implements EventListener {
 
       // there is no destination email => stop here
       if (StringUtils.isBlank(lastAuthorEmail)) {
-        return;
-      }
-
-      BaseObject commentObject = document.getXObject(COMMENT_CLASS_REFERENCE);
-      logger.debug("commentObj {}", commentObject);
-
-      // there is no comment !!!
-      if (commentObject == null) {
         return;
       }
 
@@ -100,7 +99,7 @@ public class CommentEventListener implements EventListener {
 
       // Step 2: Create the Message to send
       MimeMessage message = new MimeMessage(session);
-      if (event instanceof CommentAddedEvent) {
+      if (event instanceof XObjectAddedEvent) {
         message.setSubject("[XWiki] Comment added to " + document.toString());
       } else {
         message.setSubject("[XWiki] Comment updated on " + document.toString());
