@@ -2,6 +2,7 @@ package org.projectsforge.xwiki.commentnotification;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,14 +24,18 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.NumberProperty;
 
 @Component
 @Named("CommentNotificationEventListener")
@@ -41,6 +46,12 @@ public class CommentNotificationEventListener implements EventListener {
 
   private static final EntityReference USER_CLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
       new EntityReference("XWiki", EntityType.SPACE));
+
+  /**
+   * The reference to match class XWiki.Comment on whatever wiki.
+   */
+  private static final RegexEntityReference COMMENTCLASS_REFERENCE = new RegexEntityReference(
+      Pattern.compile(".*:XWiki.XWikiComments\\[\\d*\\]"), EntityType.OBJECT);
 
   @Inject
   private Logger logger;
@@ -57,7 +68,8 @@ public class CommentNotificationEventListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event> asList(new XObjectAddedEvent(), new XObjectUpdatedEvent());
+    return Arrays.<Event> asList(new XObjectAddedEvent(COMMENTCLASS_REFERENCE),
+        new XObjectUpdatedEvent(COMMENTCLASS_REFERENCE));
   }
 
   @Override
@@ -73,7 +85,9 @@ public class CommentNotificationEventListener implements EventListener {
     logger.debug("CommentEventListener::onEvent");
 
     try {
-      BaseObject commentObject = document.getXObject(COMMENT_CLASS_REFERENCE);
+      XObjectEvent objectEvent = (XObjectEvent) event;
+
+      BaseObject commentObject = document.getXObject((ObjectReference) objectEvent.getReference());
 
       // there is no comment !!!
       if (commentObject == null) {
@@ -105,6 +119,19 @@ public class CommentNotificationEventListener implements EventListener {
         message.setSubject("[XWiki] Comment updated on " + document.toString());
       }
       message.addRecipient(RecipientType.TO, new InternetAddress(lastAuthorEmail));
+
+      // if it is a reply to a previous comment, mail the previous comment
+      // author
+      NumberProperty replyTo = (NumberProperty) commentObject.get("replyto");
+      if (StringUtils.isNotBlank(replyTo.toText())) {
+        BaseObject previousCommentObject = document.getXObject(COMMENT_CLASS_REFERENCE, (Integer) replyTo.getValue());
+        String replytoAuthor = previousCommentObject.getStringValue("author");
+        String replytoAuthorEmail = context.getWiki().getDocument(replytoAuthor, context)
+            .getXObject(USER_CLASS_REFERENCE).getStringValue("email");
+        if (StringUtils.isNotBlank(replytoAuthorEmail)) {
+          message.addRecipient(RecipientType.TO, new InternetAddress(replytoAuthorEmail));
+        }
+      }
 
       // Step 3: Add the Message Body
       Multipart multipart = new MimeMultipart("mixed");
