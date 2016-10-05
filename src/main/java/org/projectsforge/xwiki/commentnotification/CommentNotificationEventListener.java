@@ -33,9 +33,9 @@ import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component
-@Named("CommentEventListener")
+@Named("CommentNotificationEventListener")
 @Singleton
-public class CommentEventListener implements EventListener {
+public class CommentNotificationEventListener implements EventListener {
   private static final EntityReference COMMENT_CLASS_REFERENCE = new EntityReference("XWikiComments",
       EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
@@ -62,7 +62,7 @@ public class CommentEventListener implements EventListener {
 
   @Override
   public String getName() {
-    return "CommentEventListener";
+    return "CommentNotificationEventListener";
   }
 
   @Override
