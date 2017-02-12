@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.projectsforge.xwiki</groupId>
 	<artifactId>commentnotification</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<name>XWiki Comment notification</name>
 	<packaging>jar</packaging>
 
@@ -45,6 +45,14 @@
 	</properties>
 
 	<build>
+		<extensions>
+			<!-- Enabling the use of SSH -->
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.6</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -146,11 +154,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${platform.version}</version>
-      <scope>provided</scope>
-    </dependency>
+			<groupId>org.xwiki.platform</groupId>
+			<artifactId>xwiki-platform-oldcore</artifactId>
+			<version>${platform.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -180,12 +188,13 @@
 
 	<distributionManagement>
 		<repository>
-			<id>projectsforge-private-releases</id>
-			<url>https://nexus.projectsforge.org/repository/projectsforge-public-releases/</url>
+			<id>ssh-repository</id>
+			<url>sftp://maven@static.projectsforge.org:2223/maven/</url>
 		</repository>
 		<snapshotRepository>
-			<id>projectsforge-private-snapshots</id>
-			<url>https://nexus.projectsforge.org/repository/projectsforge-public-snapshots//</url>
+			<id>ssh-repository</id>
+			<url>sftp://maven@static.projectsforge.org:2223/maven/</url>
 		</snapshotRepository>
 	</distributionManagement>
+
 </project>
